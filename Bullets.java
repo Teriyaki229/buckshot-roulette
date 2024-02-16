@@ -36,4 +36,7 @@ public class Bullets {
         return this.bullets.pop();
     }
 
+    public Object[] getBullets(){
+        return this.bullets.toArray();
+    }
 }

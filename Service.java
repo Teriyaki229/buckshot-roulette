@@ -1,4 +1,8 @@
 import java.security.SecureRandom;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Scanner;
+import java.util.Stack;
 
 public class Service {
     Bullets bullets = new Bullets();
@@ -26,34 +30,63 @@ public class Service {
         return bullets.getBulletCount();
     }
 
-    public void generateBullets(int roundNumber) {
-        switch (roundNumber) {
+    public String generateBullets() {
+        SecureRandom random = new SecureRandom();
+        int magazineSize = random.nextInt(8) + 1;
+        for (int i = 0; i <= magazineSize; i++) {
+            Bullets.Bullet bullet = random.nextBoolean() ? LIVE_BULLET : DEAD_BULLET;
+            bullets.addBullet(bullet);
+        }
+
+        
+        for (int i = 0; i < bullets.getBulletCount(); i++) {
+			int randomIndexToSwap = random.nextInt(bullets.getBulletCount());
+			int temp = array[randomIndexToSwap];
+			array[randomIndexToSwap] = array[i];
+			array[i] = temp;
+		}
+
+        return magazine;
+    }
+
+    int turn = 0;
+    boolean Player1Turn;
+
+    public void playTurn(Player player1, Player player2) {
+
+        Player1Turn = turn % 2 == 0 ? true : false;
+        String self = Player1Turn ? player1.getName() : player2.getName();
+        System.out.println(self + "'s turn");
+        System.out.println("Choose " + self + " hand. 1: Shotgun 2: Powerups");
+        Scanner scanner = new Scanner(System.in);
+        Utility util = new Utility();
+        int firstChoice = scanner.nextInt();
+        switch (firstChoice) {
             case 1:
-                if (new SecureRandom().nextInt(2) == 1) {
-                    bullets.addBullet(LIVE_BULLET);
-                    bullets.addBullet(DEAD_BULLET);
-                } else {
-                    bullets.addBullet(DEAD_BULLET);
-                    bullets.addBullet(LIVE_BULLET);
+                System.out.println("1. Shoot " + player1.getName() + " 2: Shoot " + player2.getName());
+                int shootChoice = scanner.nextInt();
+                switch (shootChoice) {
+                    case 1:
+                        Bullets.Bullet shotPlayer1Bullet = shoot(player1);
+                        util.printShotStatus(self, player1.getName(), player1.getHealth(), shotPlayer1Bullet);
+                        if (!(shotPlayer1Bullet == Bullets.Bullet.DEAD_BULLET) && self.equals(player1.getName())) {
+                            turn++;
+                        }
+                        break;
+                    case 2:
+                        Bullets.Bullet shotPlayer2Bullet = shoot(player2);
+                        util.printShotStatus(self, player2.getName(), player2.getHealth(), shotPlayer2Bullet);
+                        if (!(shotPlayer2Bullet == Bullets.Bullet.DEAD_BULLET) && self.equals(player1.getName())) {
+                            turn++;
+                        }
+                        break;
                 }
                 break;
-
             case 2:
-                for (int i = 0; i < 5; i++) {
-                    int bullet = new SecureRandom().nextInt(2);
-                    bullets.addBullet(bullet == 1 ? LIVE_BULLET : DEAD_BULLET);
-                }
-                break;
-
-            case 3:
-                for (int i = 0; i < 7; i++) {
-                    int bullet = new SecureRandom().nextInt(2);
-                    bullets.addBullet(bullet == 1 ? LIVE_BULLET : DEAD_BULLET);
-                }
+                System.out.println("TODO");
                 break;
 
             default:
-                System.out.println("Invalid round number");
                 break;
         }
     }
